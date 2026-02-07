@@ -209,16 +209,16 @@ export function OnePageCalculator() {
   };
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_16%_8%,#fffaf0_0%,transparent_35%),radial-gradient(circle_at_92%_15%,#dfeee7_0%,transparent_26%),linear-gradient(180deg,#f7f1e5_0%,#ece2d5_100%)] px-4 py-8">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_16%_8%,#FFF9F0_0%,transparent_35%),radial-gradient(circle_at_92%_15%,#EEDFCF_0%,transparent_26%),linear-gradient(180deg,#F5E6D3_0%,#EEDFCF_100%)] px-4 py-8">
       <div className="mx-auto grid w-full max-w-6xl gap-5">
-        <header className="rounded-3xl border border-[#d5cdbf] bg-[#fffdf8] px-6 py-5 shadow-[0_16px_40px_rgba(34,24,12,0.08)]">
-          <p className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold tracking-[0.14em] text-emerald-800">
+        <header className="rounded-3xl border border-[#E6D5C3] bg-[#FFF9F0] px-6 py-5 shadow-[0_16px_40px_rgba(58,42,30,0.08)]">
+          <p className="inline-flex rounded-full bg-[#F5E6D3] px-3 py-1 text-xs font-bold tracking-[0.14em] text-[#C97A2B]">
             LUNAR FIVE COMPASS
           </p>
-          <h1 className="mt-2 font-['Noto_Serif_TC'] text-2xl font-bold text-zinc-900">
+          <h1 className="mt-2 font-['Noto_Serif_TC'] text-2xl font-bold text-[#3A2A1E]">
             Lunar Five Compass
           </h1>
-          <p className="mt-2 text-sm leading-7 text-zinc-700">
+          <p className="mt-2 text-sm leading-7 text-[#8A6F55]">
             一頁式流程：先輸入生日與性別，按下「產生結果」，再以折頁方式查看結果頁與說明頁。
           </p>
         </header>
@@ -229,7 +229,7 @@ export function OnePageCalculator() {
             <AccordionContent className="px-5 pb-5">
               <form className="grid gap-4" onSubmit={onSubmit}>
                 <div className="grid gap-3 lg:grid-cols-4">
-                  <label className="grid gap-1 text-sm font-semibold text-zinc-700">
+                  <label className="grid gap-1 text-sm font-semibold text-[#8A6F55]">
                     年
                     <Select
                       value={formState.year}
@@ -249,7 +249,7 @@ export function OnePageCalculator() {
                       ))}
                     </Select>
                   </label>
-                  <label className="grid gap-1 text-sm font-semibold text-zinc-700">
+                  <label className="grid gap-1 text-sm font-semibold text-[#8A6F55]">
                     月
                     <Select
                       value={formState.month}
@@ -266,7 +266,7 @@ export function OnePageCalculator() {
                       ))}
                     </Select>
                   </label>
-                  <label className="grid gap-1 text-sm font-semibold text-zinc-700">
+                  <label className="grid gap-1 text-sm font-semibold text-[#8A6F55]">
                     日
                     <Select
                       value={formState.day}
@@ -283,7 +283,7 @@ export function OnePageCalculator() {
                       ))}
                     </Select>
                   </label>
-                  <label className="grid gap-1 text-sm font-semibold text-zinc-700">
+                  <label className="grid gap-1 text-sm font-semibold text-[#8A6F55]">
                     性別
                     <Select
                       value={formState.gender}
@@ -301,7 +301,7 @@ export function OnePageCalculator() {
                     </Select>
                   </label>
                 </div>
-                <p className="text-xs text-zinc-600">
+                <p className="text-xs text-[#8A6F55]">
                   {yearHint || "輸入年份後會顯示西元/民國對照。"}
                 </p>
                 <Button type="submit" className="mx-auto w-full md:w-72">
@@ -320,8 +320,8 @@ export function OnePageCalculator() {
               {result ? (
                 <ResultCards result={result} />
               ) : (
-                <p className="flex items-center gap-2 text-sm text-zinc-700">
-                  <AlertTriangle size={16} className="text-amber-600" />
+                <p className="flex items-center gap-2 text-sm text-[#8A6F55]">
+                  <AlertTriangle size={16} className="text-[#C97A2B]" />
                   請先在輸入頁完成資料，點「產生結果」後即可查看內容。
                 </p>
               )}

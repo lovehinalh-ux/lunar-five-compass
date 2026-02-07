@@ -62,7 +62,7 @@ export function AccordionItem({
 }) {
   return (
     <AccordionItemContext.Provider value={{ itemValue: value }}>
-      <div className={cn("rounded-3xl border border-[#d5cdbf] bg-[#fffdf8]", className)}>{children}</div>
+      <div className={cn("rounded-3xl border border-[#E6D5C3] bg-[#FFF9F0]", className)}>{children}</div>
     </AccordionItemContext.Provider>
   );
 }
@@ -83,7 +83,7 @@ export function AccordionTrigger({
     <button
       type="button"
       className={cn(
-        "flex w-full items-center justify-between rounded-3xl px-5 py-4 text-left text-base font-semibold text-zinc-900 hover:bg-zinc-50",
+        "flex w-full items-center justify-between rounded-3xl px-5 py-4 text-left text-base font-semibold text-[#3A2A1E] hover:bg-[#F5E6D3]",
         className,
       )}
       aria-expanded={isOpen}
