@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { elementInsights, elementOrder, houtianProfiles, transcriptOrder } from "@/lib/data";
 import type { ElementKey } from "@/lib/types";
 
@@ -29,7 +31,7 @@ export function ElementSystemSection({ activeElement }: { activeElement?: Elemen
             return (
               <article
                 key={element}
-                className={`rounded-2xl border p-4 transition ${
+                className={`flex h-full flex-col rounded-2xl border p-4 transition ${
                   active
                     ? "border-[#C97A2B] bg-[#F5E6D3] shadow-[0_12px_30px_rgba(58,42,30,0.14)]"
                     : "border-[#E6D5C3] bg-[#FFF9F0]"
@@ -43,6 +45,18 @@ export function ElementSystemSection({ activeElement }: { activeElement?: Elemen
                   {info.summary}
                 </p>
                 <p className="whitespace-pre-line text-sm leading-6 text-[#8A6F55]">{info.system}</p>
+                <div className="mt-auto grid gap-3 rounded-xl border border-[#E6D5C3] bg-white/40 p-4 pt-4">
+                  <div className="grid gap-1">
+                    <p className="text-sm font-semibold text-[#3A2A1E]">適合顏色：</p>
+                    <p className="text-sm font-medium leading-6 text-[#8A6F55]">{info.suitableColors}</p>
+                  </div>
+                  <div className="grid gap-1 border-t border-[#E6D5C3]/70 pt-3">
+                    <p className="text-sm font-semibold text-[#3A2A1E]">不適合顏色：</p>
+                    <p className="text-sm font-medium leading-6 text-[#8A6F55]">
+                      {info.unsuitableColors}
+                    </p>
+                  </div>
+                </div>
               </article>
             );
           })}
@@ -53,32 +67,37 @@ export function ElementSystemSection({ activeElement }: { activeElement?: Elemen
 }
 
 export function TranscriptSection() {
+  const [openPanels, setOpenPanels] = useState<string[]>([]);
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>照片文字版（後天卦數 1/2/3/4/6/7/8/9）</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm leading-7 text-[#8A6F55]">
-          已依你提供的圖片整理成可閱讀版本。若你有更高解析圖，我可再幫你逐字校對。
-        </p>
-        <div className="mt-4 grid gap-3">
-          {transcriptOrder.map((gua) => {
-            const profile = houtianProfiles[gua];
-            return (
-              <article key={gua} className="rounded-2xl border border-dashed border-[#E6D5C3] bg-[#FFF9F0] p-4">
-                <h3 className="font-semibold text-[#3A2A1E]">
-                  {gua}｜{profile.element}
-                  {profile.gua}
-                  {profile.symbol}｜{profile.type}
-                </h3>
-                <p className="mt-2 text-sm leading-7 text-[#8A6F55]">{profile.transcript}</p>
-              </article>
-            );
-          })}
-        </div>
-      </CardContent>
-    </Card>
+    <Accordion value={openPanels} onValueChange={setOpenPanels}>
+      <AccordionItem value="transcript">
+        <AccordionTrigger>後天五行一覽表</AccordionTrigger>
+        <AccordionContent className="px-5 pb-5">
+          <p className="text-sm leading-7 text-[#8A6F55]">
+            已依你提供的圖片整理成可閱讀版本。若你有更高解析圖，我可再幫你逐字校對。
+          </p>
+          <div className="mt-4 grid gap-3">
+            {transcriptOrder.map((gua) => {
+              const profile = houtianProfiles[gua];
+              return (
+                <article
+                  key={gua}
+                  className="rounded-2xl border border-dashed border-[#E6D5C3] bg-[#FFF9F0] p-4"
+                >
+                  <h3 className="font-semibold text-[#3A2A1E]">
+                    {gua}｜{profile.element}
+                    {profile.gua}
+                    {profile.symbol}｜{profile.type}
+                  </h3>
+                  <p className="mt-2 text-sm leading-7 text-[#8A6F55]">{profile.transcript}</p>
+                </article>
+              );
+            })}
+          </div>
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
   );
 }
 
