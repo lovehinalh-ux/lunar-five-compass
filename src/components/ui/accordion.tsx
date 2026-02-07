@@ -2,7 +2,7 @@ import * as React from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type AccordionValue = string | null;
+type AccordionValue = string[];
 
 interface AccordionContextValue {
   value: AccordionValue;
@@ -76,7 +76,7 @@ export function AccordionTrigger({
 }) {
   const { value, onValueChange } = useAccordionContext();
   const { itemValue } = useAccordionItemContext();
-  const isOpen = value === itemValue;
+  const isOpen = value.includes(itemValue);
   const contentId = `accordion-content-${itemValue}`;
 
   return (
@@ -88,7 +88,11 @@ export function AccordionTrigger({
       )}
       aria-expanded={isOpen}
       aria-controls={contentId}
-      onClick={() => onValueChange(isOpen ? null : itemValue)}
+      onClick={() =>
+        onValueChange(
+          isOpen ? value.filter((panel) => panel !== itemValue) : [...value, itemValue],
+        )
+      }
     >
       <span>{children}</span>
       <ChevronDown size={18} className={cn("transition-transform", isOpen && "rotate-180")} />
@@ -105,7 +109,7 @@ export function AccordionContent({
 }) {
   const { value } = useAccordionContext();
   const { itemValue } = useAccordionItemContext();
-  const isOpen = value === itemValue;
+  const isOpen = value.includes(itemValue);
   const contentId = `accordion-content-${itemValue}`;
 
   return (

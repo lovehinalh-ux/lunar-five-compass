@@ -1,12 +1,10 @@
 import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { AlertTriangle, ShieldCheck } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { buildBirthdateFromParts, toAdYear, toRocYear } from "@/lib/date-input";
 import { computeResult } from "@/lib/calculator";
-import type { ComputeOutput, Gender, YearMode } from "@/lib/types";
+import type { ComputeOutput, Gender } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import {
   Accordion,
@@ -25,22 +23,20 @@ const monthOptions = Array.from({ length: 12 }, (_, i) => String(i + 1));
 const dayOptions = Array.from({ length: 31 }, (_, i) => String(i + 1));
 
 interface FormState {
-  yearMode: YearMode;
-  year: string;
+  year: string; // AD year
   month: string;
   day: string;
   gender: Gender | "";
 }
 
 const DEFAULT_FORM_STATE: FormState = {
-  yearMode: "ad",
   year: "",
   month: "",
   day: "",
   gender: "",
 };
 
-type PanelValue = "result" | "guide" | null;
+type PanelValue = "input" | "result" | "guide";
 
 function parseSearchParams(searchParams: URLSearchParams): {
   hasAnyQuery: boolean;
@@ -48,21 +44,27 @@ function parseSearchParams(searchParams: URLSearchParams): {
   formState: FormState;
   error: string;
 } {
-  const yearModeRaw = searchParams.get("yearMode");
-  const year = searchParams.get("year") ?? "";
+  const yearModeRaw = searchParams.get("yearMode"); // legacy support
+  const adYearRaw = searchParams.get("adYear"); // legacy support
+  const yearRaw = adYearRaw ?? searchParams.get("year") ?? "";
   const month = searchParams.get("month") ?? "";
   const day = searchParams.get("day") ?? "";
   const genderRaw = searchParams.get("gender");
 
-  const hasAnyQuery = Boolean(yearModeRaw || year || month || day || genderRaw);
+  const hasAnyQuery = Boolean(yearModeRaw || yearRaw || month || day || genderRaw);
   if (!hasAnyQuery) {
     return { hasAnyQuery: false, isComplete: false, formState: DEFAULT_FORM_STATE, error: "" };
   }
 
-  const yearMode: YearMode = yearModeRaw === "roc" ? "roc" : "ad";
+  let normalizedYear = yearRaw;
+  if (yearModeRaw === "roc" && /^\d+$/.test(yearRaw)) {
+    const rocYear = Number.parseInt(yearRaw, 10);
+    normalizedYear = String(toAdYear("roc", rocYear));
+  }
+
   const gender: Gender | "" = genderRaw === "male" || genderRaw === "female" ? genderRaw : "";
-  const formState: FormState = { yearMode, year, month, day, gender };
-  const isComplete = Boolean(year && month && day && gender);
+  const formState: FormState = { year: normalizedYear, month, day, gender };
+  const isComplete = Boolean(normalizedYear && month && day && gender);
 
   if (!isComplete) {
     return {
@@ -90,16 +92,28 @@ export function OnePageCalculator() {
   const [formState, setFormState] = useState<FormState>(DEFAULT_FORM_STATE);
   const [result, setResult] = useState<ComputeOutput | null>(null);
   const [error, setError] = useState("");
-  const [activePanel, setActivePanel] = useState<PanelValue>(null);
+  const [activePanels, setActivePanels] = useState<PanelValue[]>(["input"]);
+
+  const yearOptions = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    const minYear = 1912;
+    return Array.from({ length: currentYear - minYear + 1 }, (_, index) => {
+      const adYear = currentYear - index;
+      const rocYear = toRocYear(adYear);
+      return {
+        value: String(adYear),
+        label: `西元 ${adYear} / 民國 ${rocYear}`,
+      };
+    });
+  }, []);
 
   const yearHint = useMemo(() => {
     if (!/^\d+$/.test(formState.year)) return "";
-    const yearNumber = Number.parseInt(formState.year, 10);
-    if (yearNumber < 1) return "";
-    const adYear = toAdYear(formState.yearMode, yearNumber);
+    const adYear = Number.parseInt(formState.year, 10);
+    if (adYear < 1) return "";
     const rocYear = toRocYear(adYear);
     return `年份對照：西元 ${adYear} 年 / 民國 ${rocYear} 年`;
-  }, [formState.yearMode, formState.year]);
+  }, [formState.year]);
 
   useEffect(() => {
     const parsed = parseSearchParams(searchParams);
@@ -109,15 +123,20 @@ export function OnePageCalculator() {
 
     if (!parsed.isComplete) {
       setResult(null);
-      setActivePanel(null);
+      setActivePanels(["input"]);
       setError(parsed.error);
       return;
     }
 
-    const birthdateParsed = buildBirthdateFromParts(parsed.formState);
+    const birthdateParsed = buildBirthdateFromParts({
+      yearMode: "ad",
+      year: parsed.formState.year,
+      month: parsed.formState.month,
+      day: parsed.formState.day,
+    });
     if (!birthdateParsed.value) {
       setResult(null);
-      setActivePanel(null);
+      setActivePanels(["input"]);
       setError(birthdateParsed.error);
       return;
     }
@@ -129,14 +148,14 @@ export function OnePageCalculator() {
 
     if (!computed.result) {
       setResult(null);
-      setActivePanel(null);
+      setActivePanels(["input"]);
       setError(computed.error);
       return;
     }
 
     setResult(computed.result);
     setError("");
-    setActivePanel("result");
+    setActivePanels(["input", "result"]);
   }, [searchParams]);
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -144,15 +163,20 @@ export function OnePageCalculator() {
     if (!formState.gender) {
       setError("請先選擇性別。");
       setResult(null);
-      setActivePanel(null);
+      setActivePanels(["input"]);
       return;
     }
 
-    const birthdateParsed = buildBirthdateFromParts(formState);
+    const birthdateParsed = buildBirthdateFromParts({
+      yearMode: "ad",
+      year: formState.year,
+      month: formState.month,
+      day: formState.day,
+    });
     if (!birthdateParsed.value) {
       setError(birthdateParsed.error);
       setResult(null);
-      setActivePanel(null);
+      setActivePanels(["input"]);
       return;
     }
 
@@ -164,15 +188,19 @@ export function OnePageCalculator() {
     if (!computed.result) {
       setError(computed.error);
       setResult(null);
-      setActivePanel(null);
+      setActivePanels(["input"]);
       return;
     }
 
     setResult(computed.result);
     setError("");
-    setActivePanel("result");
+    setActivePanels((prev) => {
+      const next = [...prev];
+      if (!next.includes("input")) next.push("input");
+      if (!next.includes("result")) next.push("result");
+      return next;
+    });
     setSearchParams({
-      yearMode: formState.yearMode,
       year: formState.year,
       month: formState.month,
       day: formState.day,
@@ -195,148 +223,120 @@ export function OnePageCalculator() {
           </p>
         </header>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>輸入資料</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form className="grid gap-3 md:max-w-2xl" onSubmit={onSubmit}>
-              <div className="grid gap-3 md:grid-cols-4">
-                <label className="grid gap-1 text-sm font-semibold text-zinc-700">
-                  年份格式
-                  <Select
-                    value={formState.yearMode}
-                    onChange={(event) =>
-                      setFormState((prev) => ({
-                        ...prev,
-                        yearMode: event.target.value as YearMode,
-                      }))
-                    }
-                    required
-                  >
-                    <option value="ad">西元</option>
-                    <option value="roc">民國</option>
-                  </Select>
-                </label>
-                <label className="grid gap-1 text-sm font-semibold text-zinc-700">
-                  年
-                  <Input
-                    value={formState.year}
-                    onChange={(event) =>
-                      setFormState((prev) => ({
-                        ...prev,
-                        year: event.target.value.replace(/[^\d]/g, ""),
-                      }))
-                    }
-                    inputMode="numeric"
-                    placeholder={formState.yearMode === "ad" ? "例如 1990" : "例如 79"}
-                    required
-                  />
-                </label>
-                <label className="grid gap-1 text-sm font-semibold text-zinc-700">
-                  月
-                  <Select
-                    value={formState.month}
-                    onChange={(event) =>
-                      setFormState((prev) => ({ ...prev, month: event.target.value }))
-                    }
-                    required
-                  >
-                    <option value="">請選擇</option>
-                    {monthOptions.map((item) => (
-                      <option key={item} value={item}>
-                        {item}
-                      </option>
-                    ))}
-                  </Select>
-                </label>
-                <label className="grid gap-1 text-sm font-semibold text-zinc-700">
-                  日
-                  <Select
-                    value={formState.day}
-                    onChange={(event) =>
-                      setFormState((prev) => ({ ...prev, day: event.target.value }))
-                    }
-                    required
-                  >
-                    <option value="">請選擇</option>
-                    {dayOptions.map((item) => (
-                      <option key={item} value={item}>
-                        {item}
-                      </option>
-                    ))}
-                  </Select>
-                </label>
-              </div>
-              <p className="text-xs text-zinc-600">
-                {yearHint || "輸入年份後會顯示西元/民國對照。"}
-              </p>
-              <label className="grid gap-1 text-sm font-semibold text-zinc-700 md:max-w-xs">
-                性別
-                <Select
-                  value={formState.gender}
-                  onChange={(event) =>
-                    setFormState((prev) => ({
-                      ...prev,
-                      gender: event.target.value as Gender | "",
-                    }))
-                  }
-                  required
-                >
-                  <option value="">請選擇</option>
-                  <option value="male">男性</option>
-                  <option value="female">女性</option>
-                </Select>
-              </label>
-              <Button type="submit" className="md:max-w-xs">
-                產生結果
-              </Button>
-              <p aria-live="polite" className="min-h-5 text-sm font-semibold text-red-700">
-                {error}
-              </p>
-            </form>
-          </CardContent>
-        </Card>
+        <Accordion value={activePanels} onValueChange={setActivePanels}>
+          <AccordionItem value="input">
+            <AccordionTrigger>輸入頁</AccordionTrigger>
+            <AccordionContent className="px-5 pb-5">
+              <form className="grid gap-4" onSubmit={onSubmit}>
+                <div className="grid gap-3 lg:grid-cols-4">
+                  <label className="grid gap-1 text-sm font-semibold text-zinc-700">
+                    年
+                    <Select
+                      value={formState.year}
+                      onChange={(event) =>
+                        setFormState((prev) => ({
+                          ...prev,
+                          year: event.target.value,
+                        }))
+                      }
+                      required
+                    >
+                      <option value="">請選擇年份</option>
+                      {yearOptions.map((item) => (
+                        <option key={item.value} value={item.value}>
+                          {item.label}
+                        </option>
+                      ))}
+                    </Select>
+                  </label>
+                  <label className="grid gap-1 text-sm font-semibold text-zinc-700">
+                    月
+                    <Select
+                      value={formState.month}
+                      onChange={(event) =>
+                        setFormState((prev) => ({ ...prev, month: event.target.value }))
+                      }
+                      required
+                    >
+                      <option value="">請選擇</option>
+                      {monthOptions.map((item) => (
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
+                      ))}
+                    </Select>
+                  </label>
+                  <label className="grid gap-1 text-sm font-semibold text-zinc-700">
+                    日
+                    <Select
+                      value={formState.day}
+                      onChange={(event) =>
+                        setFormState((prev) => ({ ...prev, day: event.target.value }))
+                      }
+                      required
+                    >
+                      <option value="">請選擇</option>
+                      {dayOptions.map((item) => (
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
+                      ))}
+                    </Select>
+                  </label>
+                  <label className="grid gap-1 text-sm font-semibold text-zinc-700">
+                    性別
+                    <Select
+                      value={formState.gender}
+                      onChange={(event) =>
+                        setFormState((prev) => ({
+                          ...prev,
+                          gender: event.target.value as Gender | "",
+                        }))
+                      }
+                      required
+                    >
+                      <option value="">請選擇</option>
+                      <option value="male">男性</option>
+                      <option value="female">女性</option>
+                    </Select>
+                  </label>
+                </div>
+                <p className="text-xs text-zinc-600">
+                  {yearHint || "輸入年份後會顯示西元/民國對照。"}
+                </p>
+                <Button type="submit" className="mx-auto w-full md:w-72">
+                  產生結果
+                </Button>
+                <p aria-live="polite" className="min-h-5 text-sm font-semibold text-red-700">
+                  {error}
+                </p>
+              </form>
+            </AccordionContent>
+          </AccordionItem>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>資安與部署基線</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="flex items-center gap-2 text-sm text-zinc-700">
-              <ShieldCheck size={16} className="text-emerald-700" />
-              React + TypeScript、ESLint Security、npm audit、GitHub Actions build 驗證。
-            </p>
-          </CardContent>
-        </Card>
-
-        {result ? (
-          <Accordion value={activePanel} onValueChange={(value) => setActivePanel(value as PanelValue)}>
-            <AccordionItem value="result">
-              <AccordionTrigger>結果頁</AccordionTrigger>
-              <AccordionContent className="px-5 pb-5">
+          <AccordionItem value="result">
+            <AccordionTrigger>結果頁</AccordionTrigger>
+            <AccordionContent className="px-5 pb-5">
+              {result ? (
                 <ResultCards result={result} />
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="guide">
-              <AccordionTrigger>說明頁</AccordionTrigger>
-              <AccordionContent className="grid gap-5 px-5 pb-5">
-                <ElementSystemSection activeElement={result.activeElement} />
-                <TranscriptSection />
-                <RulesSection />
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        ) : (
-          <Card>
-            <CardContent className="py-5">
-              <p className="flex items-center gap-2 text-sm text-zinc-700">
-                <AlertTriangle size={16} className="text-amber-600" />
-                請先輸入生日與性別，點「產生結果」後會顯示折頁內容。
-              </p>
-            </CardContent>
-          </Card>
-        )}
+              ) : (
+                <p className="flex items-center gap-2 text-sm text-zinc-700">
+                  <AlertTriangle size={16} className="text-amber-600" />
+                  請先在輸入頁完成資料，點「產生結果」後即可查看內容。
+                </p>
+              )}
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="guide">
+            <AccordionTrigger>說明頁</AccordionTrigger>
+            <AccordionContent className="grid gap-5 px-5 pb-5">
+              <ElementSystemSection activeElement={result?.activeElement} />
+              <TranscriptSection />
+              <RulesSection />
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </div>
     </div>
   );
