@@ -39,8 +39,10 @@ export function ElementSystemSection({ activeElement }: { activeElement?: Elemen
                   {element}
                 </span>
                 <h3 className="mt-2 font-semibold text-zinc-900">{info.title}</h3>
-                <p className="mt-1 text-sm leading-6 text-zinc-700">{info.summary}</p>
-                <p className="text-sm leading-6 text-zinc-700">{info.system}</p>
+                <p className="mt-1 whitespace-pre-line text-sm leading-6 text-zinc-700">
+                  {info.summary}
+                </p>
+                <p className="whitespace-pre-line text-sm leading-6 text-zinc-700">{info.system}</p>
               </article>
             );
           })}
