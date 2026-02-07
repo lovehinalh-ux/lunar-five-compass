@@ -3,9 +3,9 @@ import type { ComputeOutput } from "@/lib/types";
 
 function ResultRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="grid gap-1 border-b border-dashed border-[#ddd4c6] py-2 sm:grid-cols-[120px_1fr] sm:gap-3">
-      <dt className="font-semibold text-zinc-700">{label}</dt>
-      <dd className="m-0 text-zinc-900">{value}</dd>
+    <div className="grid gap-1 border-b border-dashed border-[#E6D5C3] py-2 sm:grid-cols-[120px_1fr] sm:gap-3">
+      <dt className="font-semibold text-[#8A6F55]">{label}</dt>
+      <dd className="m-0 text-[#3A2A1E]">{value}</dd>
     </div>
   );
 }
@@ -26,7 +26,7 @@ export function ResultCards({ result }: { result: ComputeOutput }) {
             <ResultRow label="農曆足歲" value={result.lunarAge} />
             <ResultRow label="農曆虛歲" value={result.virtualAge} />
           </dl>
-          <p className="mt-3 text-sm leading-7 text-zinc-700">{result.ageNote}</p>
+          <p className="mt-3 text-sm leading-7 text-[#8A6F55]">{result.ageNote}</p>
         </CardContent>
       </Card>
       <Card>
@@ -40,9 +40,9 @@ export function ResultCards({ result }: { result: ComputeOutput }) {
             <ResultRow label="五行 / 卦象" value={result.elementGua} />
             <ResultRow label="類型" value={result.personalityType} />
           </dl>
-          <p className="mt-3 text-sm leading-7 text-zinc-700">{result.personalityText}</p>
-          <p className="text-sm leading-7 text-zinc-700">{result.healthText}</p>
-          <p className="text-sm leading-7 text-zinc-700">{result.kuaNote}</p>
+          <p className="mt-3 text-sm leading-7 text-[#8A6F55]">{result.personalityText}</p>
+          <p className="text-sm leading-7 text-[#8A6F55]">{result.healthText}</p>
+          <p className="text-sm leading-7 text-[#8A6F55]">{result.kuaNote}</p>
         </CardContent>
       </Card>
     </section>

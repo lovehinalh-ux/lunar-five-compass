@@ -6,10 +6,15 @@
 
 @layer base {
   * {
-    @apply border-zinc-200;
+    border-color: #e6d5c3;
   }
 
   body {
-    @apply m-0 font-sans text-zinc-900 antialiased;
+    margin: 0;
+    color: #3a2a1e;
+    background-color: #f5e6d3;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
