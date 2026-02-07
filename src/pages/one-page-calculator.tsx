@@ -213,10 +213,10 @@ export function OnePageCalculator() {
       <div className="mx-auto grid w-full max-w-6xl gap-5">
         <header className="rounded-3xl border border-[#E6D5C3] bg-[#FFF9F0] px-6 py-5 shadow-[0_16px_40px_rgba(58,42,30,0.08)]">
           <p className="inline-flex rounded-full bg-[#F5E6D3] px-3 py-1 text-xs font-bold tracking-[0.14em] text-[#C97A2B]">
-            LUNAR FIVE COMPASS
+            後天五行
           </p>
           <h1 className="mt-2 font-['Noto_Serif_TC'] text-2xl font-bold text-[#3A2A1E]">
-            Lunar Five Compass
+            後天五行
           </h1>
           <p className="mt-2 text-sm leading-7 text-[#8A6F55]">
             一頁式流程：先輸入生日與性別，按下「產生結果」，再以折頁方式查看結果頁與說明頁。
