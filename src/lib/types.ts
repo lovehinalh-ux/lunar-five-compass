@@ -16,6 +16,8 @@ export interface ElementInsight {
   title: string;
   summary: string;
   system: string;
+  suitableColors: string;
+  unsuitableColors: string;
 }
 
 export interface ComputeInput {
