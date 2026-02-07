@@ -37,11 +37,11 @@ export function ElementSystemSection({ activeElement }: { activeElement?: Elemen
                     : "border-[#E6D5C3] bg-[#FFF9F0]"
                 }`}
               >
-                <span className="inline-flex rounded-full bg-[#F5E6D3] px-2 py-0.5 text-xs font-bold text-[#C97A2B]">
-                  {element}
-                </span>
-                <h3 className="mt-2 font-semibold text-[#3A2A1E]">{info.title}</h3>
-                <p className="mt-1 whitespace-pre-line text-sm leading-6 text-[#8A6F55]">
+                <div className="grid justify-items-center">
+                  <h3 className="text-center font-semibold text-[#3A2A1E]">{info.title}</h3>
+                  <span className="mt-2 block h-px w-20 bg-[#E6D5C3]" aria-hidden />
+                </div>
+                <p className="mt-2 whitespace-pre-line text-sm leading-6 text-[#8A6F55]">
                   {info.summary}
                 </p>
                 <p className="whitespace-pre-line text-sm leading-6 text-[#8A6F55]">{info.system}</p>

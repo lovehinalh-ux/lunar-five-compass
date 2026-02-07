@@ -118,35 +118,35 @@ export const houtianProfiles: Record<number, HoutianProfile> = {
 
 export const elementInsights: Record<ElementKey, ElementInsight> = {
   木: {
-    title: "木：仁",
+    title: "木 - 仁",
     summary: "肝、膽、筋、目\n肝 -->免疫系統\n膽 -->消化系統",
     system: "顏色：綠色、藍色\n怒傷肝：壓抑、憂鬱、報復心",
     suitableColors: "水木火相關顏色",
     unsuitableColors: "土金相關顏色",
   },
   火: {
-    title: "火：禮",
+    title: "火 - 禮",
     summary: "心、小腸、血脈、舌\n心 -->循環系統\n小腸 -->消化系統",
     system: "顏色：紅色、紫色、橘色\n喜傷心：心急、個性急、情緒起伏",
     suitableColors: "木火土相關顏色",
     unsuitableColors: "金水相關顏色",
   },
   土: {
-    title: "土：信",
+    title: "土 - 信",
     summary: "脾、胃、肌肉、口\n脾 -->免疫系統\n胃 -->消化系統",
     system: "顏色：黃色、膚色、棕色\n思傷胃：緊張、在意、思慮過多",
     suitableColors: "火土金相關顏色",
     unsuitableColors: "水木相關顏色",
   },
   金: {
-    title: "金：義",
+    title: "金 - 義",
     summary: "肺、大腸、皮膚、鼻\n肺 -->呼吸系統\n大腸 -->消化系統",
     system: "顏色：白色、銀色、淡灰色\n憂傷肺：悲觀、自以為是",
     suitableColors: "土金水相關顏色",
     unsuitableColors: "木火相關顏色",
   },
   水: {
-    title: "水：智",
+    title: "水 - 智",
     summary: "腎、膀胱、骨、耳\n腎 -->泌尿系統\n膀胱 -->泌尿系統",
     system: "顏色：黑色、深藍、深灰色\n恐傷腎：內向、傷感、分心、膽小、用腦過度",
     suitableColors: "金水木相關顏色",
